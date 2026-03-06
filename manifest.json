@@ -1,10 +1,10 @@
 {
   "version": "1",
-  "updated_at": "2026-03-03T09:35:19Z",
+  "updated_at": "2026-03-06T15:58:15Z",
   "skills": {
     "databricks": {
       "version": "0.1.0",
-      "updated_at": "2026-03-03T09:10:44Z",
+      "updated_at": "2026-03-06T13:43:51Z",
       "files": [
         "SKILL.md",
         "asset-bundles.md",
@@ -15,7 +15,7 @@
     },
     "databricks-apps": {
       "version": "0.1.0",
-      "updated_at": "2026-03-03T09:10:44Z",
+      "updated_at": "2026-03-06T09:31:02Z",
       "files": [
         "SKILL.md",
         "references/appkit/appkit-sdk.md",
@@ -28,14 +28,14 @@
     },
     "databricks-jobs": {
       "version": "0.1.0",
-      "updated_at": "2026-02-28T11:03:28Z",
+      "updated_at": "2026-03-06T13:43:51Z",
       "files": [
         "SKILL.md"
       ]
     },
     "databricks-pipelines": {
       "version": "0.1.0",
-      "updated_at": "2026-03-03T09:35:13Z",
+      "updated_at": "2026-03-06T13:43:51Z",
       "files": [
         "SKILL.md",
         "references/auto-cdc-python.md",

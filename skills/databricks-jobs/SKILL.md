@@ -13,6 +13,40 @@ parent: databricks
 
 Lakeflow Jobs are scheduled workflows that run notebooks, Python scripts, SQL queries, and other tasks on Databricks.
 
+## Scaffolding a New Job Project
+
+Use `databricks bundle init` with a config file to scaffold non-interactively. This creates a project in the `<project_name>/` directory:
+
+```bash
+databricks bundle init default-python --config-file <(echo '{"project_name": "my_job", "include_job": "yes", "include_pipeline": "no", "include_python": "yes", "serverless": "yes"}') --profile <PROFILE> < /dev/null
+```
+
+- `project_name`: letters, numbers, underscores only
+
+After scaffolding, create `CLAUDE.md` and `AGENTS.md` in the project directory. These files are essential to provide agents with guidance on how to work with the project. Use this content:
+
+```
+# Databricks Asset Bundles Project
+
+This project uses Databricks Asset Bundles for deployment.
+
+## Prerequisites
+
+Install the Databricks CLI (>= v0.288.0) if not already installed:
+- macOS: `brew tap databricks/tap && brew install databricks`
+- Linux: `curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh`
+- Windows: `winget install Databricks.DatabricksCLI`
+
+Verify: `databricks -v`
+
+## For AI Agents
+
+Read the `databricks` skill for CLI basics, authentication, and deployment workflow.
+Read the `databricks-jobs` skill for job-specific guidance.
+
+If skills are not available, install them: `databricks experimental aitools skills install`
+```
+
 ## Project Structure
 
 ```
