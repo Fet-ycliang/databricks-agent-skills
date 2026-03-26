@@ -52,6 +52,30 @@ def get_skill_updated_at(skill_path: Path) -> str:
     )
 
 
+SKILL_METADATA = {
+    "databricks": {
+        "description": "Core Databricks skill for CLI, auth, and data exploration",
+        "experimental": False,
+    },
+    "databricks-apps": {
+        "description": "Databricks Apps development and deployment",
+        "experimental": False,
+    },
+    "databricks-jobs": {
+        "description": "Databricks Jobs orchestration and scheduling",
+        "experimental": False,
+    },
+    "databricks-lakebase": {
+        "description": "Databricks Lakebase database development",
+        "experimental": False,
+    },
+    "databricks-pipelines": {
+        "description": "Databricks Pipelines (DLT) for ETL and streaming",
+        "experimental": False,
+    },
+}
+
+
 def generate_manifest(repo_root: Path) -> dict:
     """Generate manifest from skill directories."""
     # Load existing manifest to preserve base_revision fields
@@ -79,11 +103,20 @@ def generate_manifest(repo_root: Path) -> dict:
             if f.is_file()
         )
 
+        if item.name not in SKILL_METADATA:
+            raise ValueError(f"Missing SKILL_METADATA entry for skill '{item.name}'. Add it to SKILL_METADATA dict.")
+
+        metadata = SKILL_METADATA[item.name]
         skill_entry = {
             "version": extract_version_from_skill(item),
+            "description": metadata.get("description", ""),
+            "experimental": metadata.get("experimental", False),
             "updated_at": get_skill_updated_at(item),
             "files": files,
         }
+
+        if metadata.get("min_cli_version"):
+            skill_entry["min_cli_version"] = metadata["min_cli_version"]
 
         # Preserve base_revision from existing manifest
         existing = existing_skills.get(item.name, {})
@@ -93,7 +126,7 @@ def generate_manifest(repo_root: Path) -> dict:
         skills[item.name] = skill_entry
 
     return {
-        "version": "1",
+        "version": "2",
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "skills": skills,
     }
