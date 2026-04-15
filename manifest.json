@@ -13,6 +13,7 @@
         "assets/databricks.png",
         "assets/databricks.svg",
         "references/appkit/appkit-sdk.md",
+        "references/appkit/files.md",
         "references/appkit/frontend.md",
         "references/appkit/lakebase.md",
         "references/appkit/model-serving.md",
