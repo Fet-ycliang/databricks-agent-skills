@@ -1,6 +1,6 @@
 ---
 name: databricks-apps
-description: Build apps on Databricks Apps platform. Use when asked to create dashboards, data apps, analytics tools, or visualizations. Invoke BEFORE starting implementation.
+description: "Build apps on Databricks Apps platform. Use when asked to create dashboards, data apps, analytics tools, or visualizations. Evaluates data access patterns (analytics vs Lakebase synced tables) before scaffolding. Invoke BEFORE starting implementation."
 compatibility: Requires databricks CLI (>= v0.294.0)
 metadata:
   version: "0.1.1"
@@ -17,7 +17,7 @@ Build apps that deploy to Databricks Apps platform.
 
 | Phase | READ BEFORE proceeding |
 |-------|------------------------|
-| Scaffolding | Parent `databricks-core` skill (auth, warehouse discovery); run `databricks apps manifest` and use its plugins/resources to build `databricks apps init` with `--features` and `--set` (see AppKit section below) |
+| Scaffolding | **⚠️ STOP — complete the Data Access Decision Gate below before scaffolding.** Parent `databricks-core` skill (auth, warehouse discovery); then run `databricks apps manifest` + `databricks apps init` with `--features` and `--set` (see AppKit section below) |
 | Writing SQL queries | [SQL Queries Guide](references/appkit/sql-queries.md) |
 | Writing UI components | [Frontend Guide](references/appkit/frontend.md) |
 | Using `useAnalyticsQuery` | [AppKit SDK](references/appkit/appkit-sdk.md) |
@@ -58,6 +58,24 @@ Before writing any SQL, use the parent `databricks-core` skill for data explorat
 
 ## Development Workflow (FOLLOW THIS ORDER)
 
+**Data Access Decision Gate (REQUIRED before scaffolding):**
+
+If the app reads from Unity Catalog / lakehouse tables, you MUST show the comparison below to the user and ask them to choose. Do not skip this. Do not choose for them.
+
+| | **(A) Lakebase synced tables** | **(B) Analytics** |
+|--|---|---|
+| Speed | Sub-second responses | Takes a few seconds |
+| Best for | Search, lookups, catalogs, real-time data, operational apps | Dashboards, charts, aggregations, KPIs |
+| How it works | Data synced from Delta into Lakebase Postgres | Queries run on SQL warehouse at read time |
+
+After showing the table, add a brief recommendation. Default to recommending Lakebase synced tables (A) unless the use case is clearly about aggregations, charts, or dashboards where seconds of latency is acceptable. For lookups, searches, serving data to users, or any interactive use case, recommend Lakebase synced tables. Always let the user make the final call.
+
+After the user chooses:
+- (A) Lakebase synced tables → scaffold with `--features lakebase`. See [Lakebase Guide](references/appkit/lakebase.md) for full workflow.
+- (B) Analytics → scaffold with `--features analytics`.
+- Both → scaffold with `--features analytics,lakebase` if the app needs both patterns.
+- If the app does NOT read UC data (pure CRUD, Genie, Model Serving), skip this gate and scaffold with the appropriate `--features` flag.
+
 **Analytics apps** (`--features analytics`):
 
 1. Create SQL files in `config/queries/`
@@ -72,9 +90,13 @@ Before writing any SQL, use the parent `databricks-core` skill for data explorat
 **Lakebase apps** (`--features lakebase`): No SQL files or typegen. See [Lakebase Guide](references/appkit/lakebase.md) for the tRPC pattern: initialize schema at startup, write procedures in `server/server.ts`, then build the React frontend.
 
 ## When to Use What
+
+After completing the decision gate above, use this routing table:
+
 - **Read analytics data → display in chart/table**: Use visualization components with `queryKey` prop
 - **Read analytics data → custom display (KPIs, cards)**: Use `useAnalyticsQuery` hook
 - **Read analytics data → need computation before display**: Still use `useAnalyticsQuery`, transform client-side
+- **Read lakehouse data at low latency (lookups, search, catalogs)**: Use Lakebase synced tables — see [Lakebase Guide](references/appkit/lakebase.md)
 - **Read/write persistent data (users, orders, CRUD state)**: Use Lakebase pool via tRPC — see [Lakebase Guide](references/appkit/lakebase.md)
 - **Natural language query interface over tables (Genie)**: Use `genie()` plugin — see [Genie Guide](references/appkit/genie.md)
 - **Call ML model endpoint**: Use tRPC — see [Model Serving Guide](references/appkit/model-serving.md)
